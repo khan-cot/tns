@@ -376,7 +376,7 @@ func addNodeFromOld(addr string,up string,redeem *big.Int) {
 			node0.up = node1.pos
 		}
 		// check
-		if node0.up != node1.pos {
+		if node0.up != node1.pos || node0.up == node0.pos {
 			panic(fmt.Errorf("addNodeFromOld error,node0.up:%d,node1.pos:%d",node0.up,node1.pos))
 		}
 		if isSubNode(node1.pos, node0.pos) {
@@ -642,6 +642,7 @@ func finalHandleForL(pos int) {
 //===================================================================
 
 func scanNodesForLevel() {
+	count,oldcount,allcount := 0,0,len(allNodes)
 	for i:=0;i< len(allNodes);i++ {
 		var mystack Stack
 		mystack.Push(i)
@@ -652,12 +653,17 @@ func scanNodesForLevel() {
 			}
 			val,_ := mystack.Pop()
 			curPos := val.(int)
+			if count != oldcount && 0 == count % 100 {
+				println("scan0 count ",count,"all",allcount)
+				oldcount = count
+			}
 
 			if !hasSubNode(curPos) {
 				leaf := getNodeByPos(curPos)
 				if !leaf.done {
 					leaf.done = true
 					makeLeafNode(curPos)
+					count++
 				}
 			}
 			if subNodeAllDone(curPos,false) {
@@ -665,6 +671,7 @@ func scanNodesForLevel() {
 				if !node.done {
 					node.done = true
 					finalHandleForTorReward(curPos,false)
+					count++
 				}
 			} else {
 				mystack.Push(curPos)
@@ -679,6 +686,7 @@ func scanNodesForLevel() {
 	}
 }
 func scanNodesForReward() {
+	count,oldcount,allcount := 0,0,len(allNodes)
 	for i:=0;i< len(allNodes);i++ {
 		var mystack Stack
 		mystack.Push(i)
@@ -689,9 +697,16 @@ func scanNodesForReward() {
 			}
 			val,_ := mystack.Pop()
 			curPos := val.(int)
+			if count != oldcount && 0 == count % 100 {
+				println("scan1 count ",count,"all",allcount)
+				oldcount = count
+			}
 
 			if !hasSubNode(curPos) {
 				leaf := getNodeByPos(curPos)
+				if !leaf.calcRewardDone {
+					count++
+				}
 				leaf.calcRewardDone = true
 			}
 			if subNodeAllDone(curPos,true) {
@@ -700,6 +715,7 @@ func scanNodesForReward() {
 					node.calcRewardDone = true
 					finalHandleForTorReward(curPos,true)
 					finalHandleForL(curPos)
+					count++
 				}
 			} else {
 				mystack.Push(curPos)
@@ -718,7 +734,7 @@ func handleRow(record []string) {
 	addr := record[1]
 	r,b := new(big.Float).SetString(record[2])
 	if !b {
-		panic(fmt.Errorf("load error,:%s",record[3]))
+		panic(fmt.Errorf("load error,:%s",record[2]))
 	}
 	r1,_ := new(big.Float).Mul(r,new(big.Float).SetInt(unit0)).Int64()
 	redeem := big.NewInt(r1)
