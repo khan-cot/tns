@@ -124,6 +124,7 @@ type Node struct {
 	allRedeemT			[]*TRewardUnit 				// 6 count
 	rewardT				*big.Int
 	rewardL				*big.Int
+	maxLevel			int
 }
 type TRewardUnit struct {
 	level			int
@@ -174,6 +175,7 @@ func baseMakeNodeToCommon1(pos int) {
 	node.allRedeemT = make([]*TRewardUnit,6,6)
 	node.rewardT = big.NewInt(0)
 	node.rewardL = big.NewInt(0)
+	node.maxLevel = getSubMaxLevel(pos)
 	for i,_ := range node.allRedeemT {
 		node.allRedeemT[i] = &TRewardUnit{
 			level: i,
@@ -192,6 +194,7 @@ func makeLeafNode(pos int) {
 	node.allRedeemT = make([]*TRewardUnit,6,6)
 	node.rewardT = big.NewInt(0)
 	node.rewardL = big.NewInt(0)
+	node.maxLevel = 0
 	for i,_ := range node.allRedeemT {
 		if i == 0{
 			node.allRedeemT[i] = &TRewardUnit{
@@ -211,6 +214,9 @@ func makeNodeToT5(pos int,calc bool) {
 		node := getNodeByPos(pos)
 		baseMakeNodeToCommon1(pos)
 		node.selfLevelT = 5
+		if node.selfLevelT > getSubMaxLevel(pos) {
+			node.maxLevel = node.selfLevelT
+		}
 	} else {
 		calcAndSetRewardForT(pos)
 	}
@@ -220,6 +226,9 @@ func makeNodeToT4(pos int,calc bool) {
 		node := getNodeByPos(pos)
 		baseMakeNodeToCommon1(pos)
 		node.selfLevelT = 4
+		if node.selfLevelT > getSubMaxLevel(pos) {
+			node.maxLevel = node.selfLevelT
+		}
 	} else {
 		calcAndSetRewardForT(pos)
 	}
@@ -229,6 +238,9 @@ func makeNodeToT3(pos int,calc bool) {
 		node := getNodeByPos(pos)
 		baseMakeNodeToCommon1(pos)
 		node.selfLevelT = 3
+		if node.selfLevelT > getSubMaxLevel(pos) {
+			node.maxLevel = node.selfLevelT
+		}
 	} else {
 		calcAndSetRewardForT(pos)
 	}
@@ -238,6 +250,9 @@ func makeNodeToT2(pos int,calc bool) {
 		node := getNodeByPos(pos)
 		baseMakeNodeToCommon1(pos)
 		node.selfLevelT = 2
+		if node.selfLevelT > getSubMaxLevel(pos) {
+			node.maxLevel = node.selfLevelT
+		}
 	} else {
 		calcAndSetRewardForT(pos)
 	}
@@ -247,6 +262,9 @@ func makeNodeToT1(pos int,calc bool) {
 		node := getNodeByPos(pos)
 		baseMakeNodeToCommon1(pos)
 		node.selfLevelT = 1
+		if node.selfLevelT > getSubMaxLevel(pos) {
+			node.maxLevel = node.selfLevelT
+		}
 	} else {
 		calcAndSetRewardForT(pos)
 	}
@@ -402,15 +420,35 @@ func getAllSubNodePos(pos int) []int {
 	node := getNodeByPos(pos)
 	return  node.down
 }
+func getSubMaxLevel(pos int) int {
+	subs := getAllSubNodePos(pos)
+	max := 0
+	for _,ipos := range subs {
+		node := getNodeByPos(ipos)
+		if node.maxLevel > max {
+			max = node.maxLevel
+		}
+	}
+	return max
+}
+func getMaxLevel(pos int) int {
+	//max := getSubMaxLevel(pos)
+	node := getNodeByPos(pos)
+	return node.maxLevel
+}
 func getAllMoreThanLevelT(pos int,l int) int {
 	// get all subs
 	count := 0
 	subs := getAllSubNodePos(pos)
 	for _,ipos := range subs {
-		node := getNodeByPos(ipos)
-		if node.selfLevelT >= l {
+		level := getMaxLevel(ipos)
+		if level >= l {
 			count++
 		}
+		//node := getNodeByPos(ipos)
+		//if node.selfLevelT >= l {
+		//	count++
+		//}
 	}
 	return count
 }

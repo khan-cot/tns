@@ -40,7 +40,7 @@ func Test03(t *testing.T) {
 	fmt.Println("第二次扫描结束，计算奖励完成......")
 	exportNodes()
 	fmt.Println("统计结果输出到文件......")
-	//checkNode()
+	checkNode()
 }
 func checkNode() {
 	//addr := "TMmqNChoX2UzayPhKFxQZcofrroP5ErAeu"
@@ -48,11 +48,11 @@ func checkNode() {
 	pos := 2
 	node := getNodeByPos(pos)
 	subs := getAllSubNodePos(node.pos)
-	println("addr",node.addr,"root:",node.pos,"level",node.selfLevelT,"amount",node.selfRedeem.String(),)
+	println("addr",node.addr,"root:",node.pos,"level",node.selfLevelT,"amount",node.selfRedeem.String(),"max",node.maxLevel)
 
 	for _,ipos := range subs {
 		node0 := getNodeByPos(ipos)
-		println("addr",node0.addr,"root:",node0.pos,"level",node0.selfLevelT,"amount",node0.selfRedeem.String())
+		println("addr",node0.addr,"root:",node0.pos,"level",node0.selfLevelT,"amount",node0.selfRedeem.String(),"max",node0.maxLevel)
 	}
 	fmt.Println(subs)
 }
