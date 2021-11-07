@@ -354,7 +354,9 @@ func isSubNode(parent int,sub int) bool {
 func addNodeFromOld(addr string,up string,redeem *big.Int) {
 	addr = strings.Trim(addr," ")
 	up = strings.Trim(up," ")
-
+	if len(addr) == 0 {
+		panic("address is null")
+	}
 	node0,node1 := findNode(addr),findNode(up)
 	pos := len(allNodes)
 	oldup := -1
@@ -756,9 +758,11 @@ func scanNodesForReward() {
 func handleRow(record []string) {
 	up := record[0]
 	addr := record[1]
-	r,b := new(big.Float).SetString(record[2])
+	value := record[4]
+	value = strings.Trim(value," ")
+	r,b := new(big.Float).SetString(value)
 	if !b {
-		panic(fmt.Errorf("load error,:%s",record[2]))
+		panic(fmt.Errorf("load error,:%s",value))
 	}
 	r1,_ := new(big.Float).Mul(r,new(big.Float).SetInt(unit0)).Int64()
 	redeem := big.NewInt(r1)
