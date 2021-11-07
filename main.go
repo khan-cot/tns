@@ -758,7 +758,7 @@ func scanNodesForReward() {
 func handleRow(record []string) {
 	up := record[0]
 	addr := record[1]
-	value := record[4]
+	value := record[2]
 	value = strings.Trim(value," ")
 	r,b := new(big.Float).SetString(value)
 	if !b {
