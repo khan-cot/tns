@@ -379,11 +379,35 @@ func addNodeFromOld(addr string,up string,redeem *big.Int) {
 		if node0.up != node1.pos || node0.up == node0.pos {
 			panic(fmt.Errorf("addNodeFromOld error,node0.up:%d,node1.pos:%d",node0.up,node1.pos))
 		}
+		checkLoop(node0.pos)
 		if isSubNode(node1.pos, node0.pos) {
 			panic(fmt.Errorf("node1 has same sub node"))
 		}
 		node1.down = append(node1.down,node0.pos)
 	}
+}
+func checkLoop(pos int) {
+	ups := make(map[int]int)
+	fix := pos
+	for {
+		if _,ok := ups[fix]; ok {
+			fmt.Println("[",printkey(ups),"]","key",fix)
+			panic("loops.....")
+		}
+		node := getNodeByPos(pos)
+		if node.up == -1 {
+			break
+		}
+		pos = node.up
+		ups[pos] = 0
+	}
+}
+func printkey(keys map[int]int) string {
+	str := ""
+	for k,_ := range keys {
+		str = fmt.Sprintf("%s,%d",str,k)
+	}
+	return str
 }
 //===================================================================
 func hasSubNode(pos int) bool {
