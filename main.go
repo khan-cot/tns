@@ -627,7 +627,7 @@ func checkNodeRewardT(pos int) {
 		allRedeemT := getNodeByPos(pos).allRedeemT
 		for i:=0;i<6;i++ {
 			if node.selfLevelT > i {
-				unit := new(big.Int).Div(new(big.Int).Mul(allRedeemT[i].allRedeemT,big.NewInt(int64(RedeemRate))),big.NewInt(1000))
+				unit := new(big.Int).Div(new(big.Int).Mul(allRedeemT[i].allRedeemT,big.NewInt(int64(RedeemRate))),big.NewInt(10000))
 				rate1,rate2 := levelT2Rate(node.selfLevelT),levelT2Rate(i)
 				dot := int64(rate1 - rate2)
 				rewardT = new(big.Int).Add(rewardT,new(big.Int).Div(new(big.Int).Mul(unit,big.NewInt(dot)),big.NewInt(100)))
@@ -659,7 +659,7 @@ func finalHandleForL(pos int) {
 	}
 	redeems := getLayerAllRedeem(pos,max)
 	for i,v := range redeems {
-		unit := new(big.Int).Div(new(big.Int).Mul(v,big.NewInt(int64(RedeemRate))),big.NewInt(1000))
+		unit := new(big.Int).Div(new(big.Int).Mul(v,big.NewInt(int64(RedeemRate))),big.NewInt(10000))
 		rate := int64(layer2Rate(i+1))
 		lReward = new(big.Int).Add(lReward,new(big.Int).Div(new(big.Int).Mul(unit,big.NewInt(rate)),big.NewInt(1000)))
 	}
@@ -799,16 +799,24 @@ func LoadNodeFromFile() {
 func exportNodes() {
 	datas := make([][]string,0,0)
 	datas = append(datas,[]string{
-		"上级地址","自己地址","自己赎回总数","级别奖励","团队奖励","级别",
+		"上级地址","自己地址","自己赎回总数","自己赎回总数0","静态赎回","级别奖励","级别奖励1","团队奖励","团队奖励1","级别",
 	})
+	unit1 := new(big.Float).SetInt(unit0)
 	for k,v := range mapNodes {
 		node := getNodeByPos(v)
 		up := ""
 		if node.up != -1 {
 			up = getNodeByPos(node.up).addr
 		}
+		reward0 := new(big.Float).Quo(new(big.Float).SetInt(node.rewardT),unit1)
+		reward1 := new(big.Float).Quo(new(big.Float).SetInt(node.rewardL),unit1)
+		redeem0 := new(big.Float).Quo(new(big.Float).SetInt(node.selfRedeem),unit1)
+		tmp := new(big.Int).Div(new(big.Int).Mul(node.selfRedeem,big.NewInt(int64(RedeemRate))),big.NewInt(10000))
+		redeem1 := new(big.Float).Quo(new(big.Float).SetInt(tmp),unit1)
+
 		datas = append(datas,[]string {
-			up,k,node.selfRedeem.String(),node.rewardL.String(),
+			up,k,redeem0.Text('f',4),node.selfRedeem.String(),redeem1.Text('f',4),
+			reward1.Text('f',4), node.rewardL.String(), reward0.Text('f',4),
 			node.rewardT.String(),fmt.Sprint(node.selfLevelT),
 		})
 	}
