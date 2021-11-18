@@ -799,7 +799,7 @@ func LoadNodeFromFile() {
 func exportNodes() {
 	datas := make([][]string,0,0)
 	datas = append(datas,[]string{
-		"上级地址","自己地址","自己赎回总数","自己赎回总数0","静态赎回","级别奖励","级别奖励1","团队奖励","团队奖励1","级别",
+		"上级地址","自己地址","自己赎回总数","自己赎回总数0","静态赎回","级别奖励","级别奖励1","团队奖励","团队奖励1","级别","总算力",
 	})
 	unit1 := new(big.Float).SetInt(unit0)
 	for k,v := range mapNodes {
@@ -813,11 +813,12 @@ func exportNodes() {
 		redeem0 := new(big.Float).Quo(new(big.Float).SetInt(node.selfRedeem),unit1)
 		tmp := new(big.Int).Div(new(big.Int).Mul(node.selfRedeem,big.NewInt(int64(RedeemRate))),big.NewInt(10000))
 		redeem1 := new(big.Float).Quo(new(big.Float).SetInt(tmp),unit1)
+		all := new(big.Int).Sub(new(big.Int).Set(node.allSubRedeem),new(big.Int).Set(node.selfRedeem))
 
 		datas = append(datas,[]string {
 			up,k,redeem0.Text('f',4),node.selfRedeem.String(),redeem1.Text('f',4),
 			reward1.Text('f',4), node.rewardL.String(), reward0.Text('f',4),
-			node.rewardT.String(),fmt.Sprint(node.selfLevelT),
+			node.rewardT.String(),fmt.Sprint(node.selfLevelT),all.String(),
 		})
 	}
 	WriteCsv(datas)
