@@ -32,6 +32,7 @@ func Test02(t *testing.T) {
 }
 func Test03(t *testing.T) {
 	LoadNodeFromFile()
+	//checkNode2()
 	fmt.Println("开始第一次扫描，定义级别......")
 	scanNodesForLevel()
 	fmt.Println("扫描结束，定义级别完成......")
@@ -40,13 +41,13 @@ func Test03(t *testing.T) {
 	fmt.Println("第二次扫描结束，计算奖励完成......")
 	exportNodes()
 	fmt.Println("统计结果输出到文件......")
-	checkNode()
+	//checkNode()
 }
 func checkNode() {
-	//addr := "TMmqNChoX2UzayPhKFxQZcofrroP5ErAeu"
-	//node := findNode(addr)
-	pos := 2
-	node := getNodeByPos(pos)
+	addr := "TMmqNChoX2UzayPhKFxQZcofrroP5ErAeu"
+	node := findNode(addr)
+	//pos := 2
+	//node := getNodeByPos(pos)
 	subs := getAllSubNodePos(node.pos)
 	println("addr",node.addr,"root:",node.pos,"level",node.selfLevelT,"amount",node.selfRedeem.String(),"max",node.maxLevel)
 
@@ -55,6 +56,27 @@ func checkNode() {
 		println("addr",node0.addr,"root:",node0.pos,"level",node0.selfLevelT,"amount",node0.selfRedeem.String(),"max",node0.maxLevel)
 	}
 	fmt.Println(subs)
+}
+func checkNode2() {
+	//addr := "TMmqNChoX2UzayPhKFxQZcofrroP5ErAeu"
+	//node := findNode(addr)
+	pos := 1283
+	node := getNodeByPos(pos)
+	subs := getAllSubNodePos(node.pos)
+	println("addr",node.addr,"up",node.up,"root:",node.pos,"subs",printSubs(subs))
+
+	for _,ipos := range subs {
+		node0 := getNodeByPos(ipos)
+		println("addr",node0.addr,"up",node0.up,"root:",node0.pos,"subs",printSubs(getAllSubNodePos(node0.pos)))
+	}
+	fmt.Println(subs)
+}
+func printSubs(subs []int) string {
+	str := ""
+	for _,v := range subs {
+		str = fmt.Sprintf("%s,%d",str,v)
+	}
+	return str
 }
 func printSubNode(pos int,subs []int) {
 	if len(subs) == 0 {
