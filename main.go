@@ -45,8 +45,8 @@ func (stack *Stack) Pop() (interface{}, error)  {
 //===================================================================
 var(
 	MAXLEVEL = 100
-	T1Redeem0 = new(big.Int).Mul(big.NewInt(200000),big.NewInt(1e8))
-	T1Redeem1 = new(big.Int).Mul(big.NewInt(60000),big.NewInt(1e8))
+	T1Redeem0 = new(big.Int).Mul(big.NewInt(400000),big.NewInt(1e8))
+	T1Redeem1 = new(big.Int).Mul(big.NewInt(120000),big.NewInt(1e8))
 	RedeemRate = 20
 	unit0 = big.NewInt(1e8)
 )
