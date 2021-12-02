@@ -45,10 +45,10 @@ func (stack *Stack) Pop() (interface{}, error)  {
 //===================================================================
 var(
 	MAXLEVEL = 100
-	T1Redeem0 = new(big.Int).Mul(big.NewInt(400000),big.NewInt(1e8))
-	T1Redeem1 = new(big.Int).Mul(big.NewInt(120000),big.NewInt(1e8))
-	RedeemRate = 20
 	unit0 = big.NewInt(1e8)
+	T1Redeem0 = new(big.Int).Mul(big.NewInt(400000),unit0)
+	T1Redeem1 = new(big.Int).Mul(big.NewInt(120000),unit0)
+	RedeemRate = 20
 )
 
 
@@ -77,15 +77,15 @@ func levelT2Redeem(l int) *big.Int {
 	}
 	switch l {
 	case 1:
-		return new(big.Int).Mul(big.NewInt(10000),big.NewInt(1e8))
+		return new(big.Int).Mul(big.NewInt(10000),unit0)
 	case 2:
-		return new(big.Int).Mul(big.NewInt(20000),big.NewInt(1e8))
+		return new(big.Int).Mul(big.NewInt(20000),unit0)
 	case 3:
-		return new(big.Int).Mul(big.NewInt(30000),big.NewInt(1e8))
+		return new(big.Int).Mul(big.NewInt(30000),unit0)
 	case 4:
-		return new(big.Int).Mul(big.NewInt(30000),big.NewInt(1e8))
+		return new(big.Int).Mul(big.NewInt(30000),unit0)
 	case 5:
-		return new(big.Int).Mul(big.NewInt(30000),big.NewInt(1e8))
+		return new(big.Int).Mul(big.NewInt(30000),unit0)
 	default:
 		panic(fmt.Errorf("invalid levelT,%d",l))
 	}
@@ -311,7 +311,7 @@ func main() {
 	scanNodesForLevel()
 	fmt.Println("扫描结束，定义级别完成......")
 	fmt.Println("第二次扫描，计算奖励......")
-	scanNodesForReward()
+	//scanNodesForReward()
 	fmt.Println("第二次扫描结束，计算奖励完成......")
 	exportNodes()
 	fmt.Println("统计结果输出到文件......")
@@ -799,7 +799,7 @@ func LoadNodeFromFile() {
 func exportNodes() {
 	datas := make([][]string,0,0)
 	datas = append(datas,[]string{
-		"上级地址","自己地址","自己赎回总数","自己赎回总数0","静态赎回","级别奖励","级别奖励1","团队奖励","团队奖励1","级别","总算力",
+		"上级地址","自己地址","自己总数","自己总数0","总算力",
 	})
 	unit1 := new(big.Float).SetInt(unit0)
 	for k,v := range mapNodes {
@@ -808,17 +808,11 @@ func exportNodes() {
 		if node.up != -1 {
 			up = getNodeByPos(node.up).addr
 		}
-		reward0 := new(big.Float).Quo(new(big.Float).SetInt(node.rewardT),unit1)
-		reward1 := new(big.Float).Quo(new(big.Float).SetInt(node.rewardL),unit1)
 		redeem0 := new(big.Float).Quo(new(big.Float).SetInt(node.selfRedeem),unit1)
-		tmp := new(big.Int).Div(new(big.Int).Mul(node.selfRedeem,big.NewInt(int64(RedeemRate))),big.NewInt(10000))
-		redeem1 := new(big.Float).Quo(new(big.Float).SetInt(tmp),unit1)
 		all := new(big.Int).Sub(new(big.Int).Set(node.allSubRedeem),new(big.Int).Set(node.selfRedeem))
 
 		datas = append(datas,[]string {
-			up,k,redeem0.Text('f',4),node.selfRedeem.String(),redeem1.Text('f',4),
-			reward1.Text('f',4), node.rewardL.String(), reward0.Text('f',4),
-			node.rewardT.String(),fmt.Sprint(node.selfLevelT),all.String(),
+			up,k,redeem0.Text('f',4),node.selfRedeem.String(),all.String(),
 		})
 	}
 	WriteCsv(datas)
